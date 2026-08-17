@@ -1,16 +1,58 @@
+/* ==========================================
+   LUNA COLOR PALETTE & GLOBAL VARIABLES
+   ========================================== */
+:root {
+  --bg-dark: #011c40;
+  --bg-card: #023859;
+  --border: #26658c;
+  --accent-secondary: #54acbf;
+  --accent: #a7ebf2;
+  
+  --accent-bg: rgba(167, 235, 242, 0.12);
+  --accent-border: #54acbf;
+  --text-h: #ffffff;
+  --text-body: #d1e8f2;
+  --social-bg: #023859;
+  --shadow: 0 10px 25px rgba(1, 28, 64, 0.6);
+}
+
+/* ==========================================
+   BASE / RESET STYLES
+   ========================================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: radial-gradient(circle at top, #023859 0%, #011c40 100%);
+  color: var(--text-body);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================
+   COMPONENTS & LAYOUT
+   ========================================== */
 .counter {
   font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
+  padding: 6px 16px;
+  border-radius: 20px;
   color: var(--accent);
   background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.3s;
+  border: 1.5px solid transparent;
+  transition: all 0.3s ease;
   margin-bottom: 24px;
 
   &:hover {
     border-color: var(--accent-border);
+    color: var(--text-h);
+    box-shadow: 0 0 15px rgba(167, 235, 242, 0.2);
   }
+
   &:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
@@ -42,8 +84,7 @@
     z-index: 1;
     top: 34px;
     height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
+    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg) scale(1.4);
   }
 
   .vite {
@@ -51,8 +92,7 @@
     top: 107px;
     height: 26px;
     width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
+    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg) scale(0.8);
   }
 }
 
@@ -78,6 +118,7 @@
   & > div {
     flex: 1 1 0;
     padding: 32px;
+
     @media (max-width: 1024px) {
       padding: 24px 20px;
     }
@@ -118,18 +159,23 @@
   a {
     color: var(--text-h);
     font-size: 16px;
-    border-radius: 6px;
+    border-radius: 8px;
     background: var(--social-bg);
+    border: 1px solid var(--border);
     display: flex;
-    padding: 6px 12px;
+    padding: 8px 14px;
     align-items: center;
     gap: 8px;
     text-decoration: none;
-    transition: box-shadow 0.3s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     &:hover {
       box-shadow: var(--shadow);
+      border-color: var(--accent);
+      background: rgba(84, 172, 191, 0.2);
+      transform: translateY(-2px);
     }
+
     .button-icon {
       height: 18px;
       width: 18px;
@@ -156,6 +202,7 @@
 #spacer {
   height: 88px;
   border-top: 1px solid var(--border);
+
   @media (max-width: 1024px) {
     height: 48px;
   }
@@ -169,16 +216,17 @@
   &::after {
     content: '';
     position: absolute;
-    top: -4.5px;
+    top: -5.5px;
     border: 5px solid transparent;
   }
 
   &::before {
     left: 0;
-    border-left-color: var(--border);
+    border-left-color: var(--accent);
   }
+
   &::after {
     right: 0;
-    border-right-color: var(--border);
+    border-right-color: var(--accent);
   }
 }
