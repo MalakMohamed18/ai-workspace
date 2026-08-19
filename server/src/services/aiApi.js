@@ -1,46 +1,120 @@
-import axios from "axios";
-import FormData from "form-data";
+import "dotenv/config";
 
 const AI_API_URL =
   process.env.AI_API_URL || "http://127.0.0.1:8000";
 
-export async function generatePrompt(message, decomposition = true) {
-  const response = await axios.post(
-    `${AI_API_URL}/generation/generation`,
-    {
-      original_query: message
-    },
-    {
-      params: {
-        decomposition
-      },
-      timeout: 120000
-    }
-  );
+// ========================================
+// Upload Document
+// ========================================
 
-  return response.data;
-}
+export async function uploadDocument(file) {
+  const formData = new FormData();
 
-export async function uploadToAI(file) {
-  const form = new FormData();
-
-  form.append("file", file.buffer, {
-    filename: file.originalname,
-    contentType: file.mimetype
+  const blob = new Blob([file.buffer], {
+    type: file.mimetype,
   });
 
-  const response = await axios.post(
+  formData.append("file", blob, file.originalname);
+
+  const response = await fetch(
     `${AI_API_URL}/documents/upload`,
-    form,
     {
-      headers: {
-        ...form.getHeaders()
-      },
-      timeout: 300000,
-      maxContentLength: Infinity,
-      maxBodyLength: Infinity
+      method: "POST",
+      body: formData,
     }
   );
 
-  return response.data;
+  const text = await response.text();
+
+  let data;
+
+  try {
+    data = JSON.parse(text);
+  } catch {
+    data = {
+      raw: text,
+    };
+  }
+
+  if (!response.ok) {
+    const error = new Error(
+      data?.message ||
+        data?.detail ||
+        data?.error ||
+        "AI API upload failed"
+    );
+
+    error.status = response.status;
+    error.data = data;
+
+    throw error;
+  }
+
+  return data;
+}
+
+// ========================================
+// Generate Prompt
+// ========================================
+
+export async function generatePrompt(
+  message,
+  decomposition = true
+) {
+  const response = await fetch(
+    `${AI_API_URL}/generation/generation`,
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify({
+        original_query: message,
+        decomposition,
+      }),
+    }
+  );
+
+  const text = await response.text();
+
+  let data;
+
+  try {
+    data = JSON.parse(text);
+  } catch {
+    data = {
+      raw: text,
+    };
+  }
+
+  if (!response.ok) {
+    const error = new Error(
+      data?.message ||
+        data?.detail ||
+        data?.error ||
+        "AI API generation failed"
+    );
+
+    error.status = response.status;
+    error.data = data;
+
+    throw error;
+  }
+
+  // The Medical RAG API returns the generated prompt.
+  if (typeof data === "string") {
+    return data;
+  }
+
+  if (data?.prompt) {
+    return data.prompt;
+  }
+
+  if (data?.raw) {
+    return data.raw;
+  }
+
+  return data;
 }

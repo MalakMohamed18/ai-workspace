@@ -1,41 +1,51 @@
+import "dotenv/config";
+
 import express from "express";
 import cors from "cors";
 
-import chatRoutes from "./routes/chatRoutes.js";
-import messageRoutes from "./routes/messageRoutes.js";
+import chatRouter from "./routes/chat.js";
+import uploadRouter from "./routes/upload.js";
+import documentsRouter from "./routes/documents.js";
 
 const app = express();
 
+const PORT = process.env.PORT || 5000;
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
-  })
-);
-
-app.use(express.json());
-
-app.get(
-  "/api/health",
-  (req, res) => {
-    res.json({
-      success: true,
-      message:
-        "AI Workspace API is running",
-    });
-  }
+    origin:
+      process.env.CLIENT_URL ||
+      "http://localhost:5173",
+  }),
 );
 
 app.use(
-  "/api/chats",
-  chatRoutes
+  express.json({
+    limit: "10mb",
+  }),
+);
+
+app.get("/api/health", (req, res) => {
+  res.json({
+    success: true,
+    message: "Web backend is running.",
+  });
+});
+
+app.use(
+  "/api/chat",
+  chatRouter,
 );
 
 app.use(
-  "/api/messages",
-  messageRoutes
+  "/api/upload",
+  uploadRouter,
 );
 
-/* Error Handler */
+app.use(
+  "/api/documents",
+  documentsRouter,
+);
 
 app.use(
   (error, req, res, next) => {
@@ -44,9 +54,18 @@ app.use(
     res.status(500).json({
       success: false,
       message:
-        "Internal server error",
+        "Internal server error.",
     });
-  }
+  },
 );
 
-export default app;
+app.listen(PORT, () => {
+  console.log(`
+========================================
+ Medical RAG Web Backend
+========================================
+ Server: http://localhost:${PORT}
+ AI API: ${process.env.AI_API_URL}
+========================================
+  `);
+});
